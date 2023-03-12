@@ -1,0 +1,44 @@
+#photo-input {
+    height: 10rem;
+    position: relative;
+    border: 2px dashed #555;
+    border-radius: 0.625rem;
+    padding: 0.625rem;
+    padding-top: 6rem;
+}
+
+#photo-input::before {
+    content: "Arraste a imagem aqui";
+    position: absolute;
+    top: 3rem;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #555;
+}
+
+#photo-input::after {
+    content: "ou";
+    position: absolute;
+    top: 4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #555;
+}
+
+#photo-input::-webkit-file-upload-button {
+    background-color: var(--blue);
+    border: none;
+    border-radius: 0.3125rem;
+    height: 2rem;
+    color: var(--white);
+    transform: all 0.2s ease-in-out;
+}
+
+#photo-input::-webkit-file-upload-button:hover {
+    transform: scale(1.05);
+    background: #0d45a5;
+}
