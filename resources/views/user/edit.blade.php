@@ -8,15 +8,21 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="d-flex flex-column gap-3">
-                                <img id="img-fluid" class="img-thumbnail mt-3"
-                                    src="{{ asset($user->photo ? 'uploads/' . $user->photo : 'images/default-photo.jpg') }}"
+                                <img id="img-thumbnail" class="img-thumbnail mt-3"
+                                    src="{{ asset($user->photo ? 'storage/uploads/' . $user->photo : 'images/default-photo.jpg') }}"
                                     alt="Profile Image">
                                 <input type="file" class="mt-3" name="photo "id="photo-input" accept="image/*"
                                     required>
-                                <button type="submit" id="upload" class="btn btn-success align-middle mt-3"
-                                    title="Upload de Fotos">
-                                    <i class="fa fa-upload"></i>
-                                </button>
+                                <div class="btn-group btn-group-toggle">
+                                    <button type="submit" id="upload" class="btn btn-success align-middle mt-3"
+                                        title="Upload de Fotos">
+                                        <i class="fa fa-upload"></i>
+                                    </button>
+                                    <button type="button" id="remove-photo" class="btn btn-danger align-middle mt-3"
+                                        title="Upload de Fotos">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-8">
@@ -70,13 +76,13 @@
             var file = $('#photo-input')[0].files[0];
             var _token = '{{ csrf_token() }}';
             var formData = new FormData();
-            var baseUploadFolder = '{{ asset('/uploads') }}';
+            var baseUploadFolder = '{{ asset('storage/uploads') }}';
 
             formData.append('photo', file);
             formData.append('_token', _token);
 
             $.ajax({
-                url: '{{ url('user/upload/photo' . (isset($user) ? '/' . $user->id : '')) }}',
+                url: '{{ url('user/' . (isset($user) ? $user->id : '') . '/photo/upload') }}',
                 cache: false,
                 contentType: false,
                 processData: false,
@@ -95,25 +101,70 @@
                     var img = document.getElementById('img-thumbnail');
 
                     img.src = baseUploadFolder + '/' + hashedFileName;
-
+                    console.log(hashedFileName);
                     setTimeout(() => {
                         alert.classList += ' d-none';
-                    }, 3000);
+                    }, 5000);
                 },
                 error: function() {
                     const alert = document.getElementById('uploadAlert')
 
                     alert.innerHTML = 'Erro ao realizar upload!';
                     alert.classList.contains('alert-success') && alert.classList.remove(
-                        'alert-succes')
+                        'alert-success')
                     alert.classList += 'alert-danger';
                     alert.classList.remove('d-none');
 
                     setTimeout(() => {
                         alert.classList += ' d-none';
-                    }, 3000);
+                    }, 5000);
                 }
             });
+        });
+
+        $("#remove-photo").on('click', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '{{ url('user/' . (isset($user) ? $user->id : '') . '/photo/remove') }}',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: {
+                    id: {{ $user->id }}
+                },
+                type: 'get',
+                success: function(message) {
+                    const alert = document.getElementById('uploadAlert')
+
+                    alert.innerHTML = message;
+                    alert.classList.contains('alert-danger') && alert.classList.remove(
+                        'alert-danger')
+                    alert.classList += ' alert-success';
+                    alert.classList.remove('d-none');
+
+                    // alter user image
+                    var img = document.getElementById('img-thumbnail');
+
+                    img.src = '{{ asset('images/default-photo.jpg') }}';
+                    setTimeout(() => {
+                        alert.classList += ' d-none';
+                    }, 5000);
+                },
+                error: function(message) {
+                    const alert = document.getElementById('uploadAlert')
+
+                    alert.innerHTML = message;
+                    alert.classList.contains('alert-success') && alert.classList.remove(
+                        'alert-success')
+                    alert.classList += ' alert-danger';
+                    alert.classList.remove('d-none');
+
+                    setTimeout(() => {
+                        alert.classList += ' d-none';
+                    }, 5000);
+                }
+            })
         });
     </script>
 @endpush

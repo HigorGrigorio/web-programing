@@ -29,4 +29,5 @@ Route::post('/user', [UserController::class, 'store']);
 Route::post('/user/delete/{id}', [UserController::class, 'delete']);
 Route::post('/user/update/{id}', [UserController::class, 'update']);
 
-Route::post('/user/upload/photo/{id}', [PhotoController::class, 'upload']);
+Route::post('/user/{id}/photo/upload', [PhotoController::class, 'upload']);
+Route::get('/user/{id}/photo/remove', [PhotoController::class, 'remove']);
