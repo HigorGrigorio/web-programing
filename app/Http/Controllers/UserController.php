@@ -22,7 +22,8 @@ class UserController extends Controller
                 'users' => $users
             ]
          */
-        );
+
+        )->with(['success', 'Usuário cadastrado com sucesso']);
     }
 
     public function create()
@@ -41,7 +42,7 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->save();
 
-        return redirect('users')->with(['message' => 'Usuário cadastrado com sucesso.']);
+        return redirect('users')->with(['success' => 'Usuário cadastrado com sucesso.']);
     }
 
     public function delete($id)
@@ -49,7 +50,7 @@ class UserController extends Controller
         $user = User::find($id);
         $user->delete();
 
-        return redirect('users')->with(['message' => 'Usuário excluído com sucesso.']);
+        return redirect('users')->with(['success' => 'Usuário excluído com sucesso.']);
     }
 
     public function edit($id)
@@ -71,6 +72,6 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->save();
 
-        return redirect('users')->with(['message' => 'Usuário atualizado com sucesso.']);
+        return redirect('users')->with(['success' => 'Usuário atualizado com sucesso.']);
     }
 }

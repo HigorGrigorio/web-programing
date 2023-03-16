@@ -6,6 +6,7 @@
             <div class="tile">
                 <div class="tile-body">
                     <div class="col-md-8">
+                        <x-validation />
                         <form action="{{ url('user') }}" method="post">
                             @csrf
                             <div class="form-group" @error('name') invalid @enderror>
@@ -13,11 +14,11 @@
                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
                                     name="name" placeholder="Nome" value="">
                                 @error('name')
-                                    <div class="alert alert-danger mt-2" role="alert">
-                                        @foreach ($errors->get('name') as $error)
+                                    @foreach ($errors->get('name') as $error)
+                                        <span class="invalid-feedback" role="alert">
                                             {{ $error }}
-                                        @endforeach
-                                    </div>
+                                        </span>
+                                    @endforeach
                                 @enderror
                             </div>
                             <div class="form-group" @error('email') invalid @enderror>
@@ -25,11 +26,11 @@
                                 <input type="text" class="form-control @error('email') is-invalid @enderror"
                                     name="email" placeholder="Email" value="">
                                 @error('email')
-                                    <div class="alert alert-danger mt-2" role="alert">
-                                        @foreach ($errors->get('email') as $error)
+                                    @foreach ($errors->get('email') as $error)
+                                        <span class="invalid-feedback" role="alert">
                                             {{ $error }}
-                                        @endforeach
-                                    </div>
+                                        </span>
+                                    @endforeach
                                 @enderror
                             </div>
                             <div class="d-flex justify-content-center justify-content-between pt-4">

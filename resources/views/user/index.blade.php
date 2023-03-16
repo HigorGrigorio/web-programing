@@ -5,11 +5,7 @@
         <div class="container">
             <div class="tile">
                 <div class="tile-body">
-                    @if (session('message'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('message') }}
-                        </div>
-                    @endif
+                    <x-alert />
                     <a href="{{ url('user/new') }}" class="btn btn-warning mb-3 btn-lg">
                         <i class="fa fa-plus-circle"></i>
                         <span class="ml-2">Inserir novo usuário</span>
