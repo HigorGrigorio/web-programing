@@ -8,7 +8,7 @@
 }
 
 #photo-input::before {
-    content: "Arraste a imagem aqui";
+    content: "Arraste sua foto aqui";
     position: absolute;
     top: 3rem;
     left: 50%;
