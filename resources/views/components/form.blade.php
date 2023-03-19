@@ -1,4 +1,4 @@
-<form action="{{ $action }}" method="{{ $action }}" id="{{ $id }}">
+<form action="{{ $action }}" method="{{ $method }}" id="{{ $id }}">
     @csrf
     @foreach ($fields as $field)
         <div class="form-group" @error($field['name']) invalid @enderror>
