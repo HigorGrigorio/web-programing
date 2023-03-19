@@ -5,7 +5,7 @@
         <div class="container">
             <div class="tile">
                 <div class="tile-body">
-                    <x-form :user="$user" context="edit"></x-form>
+                    @include('user.__form', ['context' => 'edit'])
                 </div>
             </div>
         </div>

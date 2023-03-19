@@ -15,14 +15,26 @@ class Form extends Component
      * Create a new component instance.
      */
     public function __construct(
-        /**
-         * Current user
-         */
-        public $user = null,
+        public string $id = 'form',
 
-        public $context = "edit"
+        public string $method = 'POST',
+
+        public string $action = '/',
+
+        public array $fields = [],
+
+        public array $submit = [],
+
+        public array $previous = [],
     ) {
-        //
+        $this->submit = array_merge([
+            'label' => 'Submit',
+        ], $this->submit);
+
+        $this->previous = array_merge([
+            'label' => 'Previous',
+            'url' => url()->previous(),
+        ], $this->previous);
     }
 
     /**
