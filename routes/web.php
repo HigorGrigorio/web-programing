@@ -19,9 +19,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/users', [UserController::class, 'index']);
+
 
 Route::prefix('user')->group(function () {
-    Route::get('/', [UserController::class, 'index']);
     Route::get('/new', [UserController::class, 'create']);
     Route::get('/delete/{id}', [UserController::class, 'confirm']);
     Route::get('/edit/{id}', [UserController::class, 'edit']);

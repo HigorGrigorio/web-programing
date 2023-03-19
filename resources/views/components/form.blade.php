@@ -50,9 +50,7 @@
                 <button type="submit" class="btn btn-primary btn-lg">Salvar</button>
                 <a href="{{ url('/users') }}" class="btn btn-danger btn-lg">Cancelar</a>
             </div>
-            <div class="col-md-12" id="notify-container">
-                <div id="uploadAlert" class="alert alert-danger mt-3 d-none" role="alert">
-                </div>
+            <div class="col-md-12 pt-5 px-0" id="notify-container">
             </div>
         </form>
     </div>
@@ -66,7 +64,6 @@
          * the current photo is removed and the default photo is displayed
          */
         let current = null;
-        const defaultPhoto = "{{ asset('images/default-photo.jpg') }}";
 
         const makeAlert = (context, value) => {
             return `
@@ -98,9 +95,14 @@
             }, 5000);
         }
 
-        // save a copy of the current photo from img tuumbnail
-        $(window).on('load', () => {
+        // save a copy of the current photo from img thumbnail
+        const saveCurrentPhoto = () => {
             photoUrl = $('#img-thumbnail').attr('src');
+
+            // for default photo
+            if (photoUrl.includes('default-photo.jpg')) {
+                return false;
+            }
 
             // download the photo
             $.ajax({
@@ -114,14 +116,14 @@
                         type: xhr.getResponseHeader('Content-Type')
                     });
 
-                    console.log(current);
                 },
                 error: function(xhr, status, error) {
                     notifyError('Não foi possível carregar a foto atual.');
                 }
             });
 
-        })
+            return true;
+        }
 
         const priviewImage = (url) => {
             $('#img-thumbnail').attr('src', url);
@@ -130,6 +132,25 @@
         const updateUserPhoto = (photo) => {
 
             if (!photo) {
+                $.ajax({
+                    url: '{{ url('user/' . (isset($user) ? $user->id : '-1') . '/photo/remove') }}',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                    },
+                    type: 'get',
+                    success: function(message) {
+                        // alter user image url
+                        const url = '{{ asset('images/default-photo.jpg') }}';
+
+                        priviewImage(url);
+                        notifySuccess(message);
+                    },
+                    error: notifyError
+                });
+
                 return;
             }
 
@@ -163,16 +184,35 @@
         $("#upload").click((e) => {
             e.preventDefault();
 
+            if (current === null) {
+                saveCurrentPhoto();
+            }
+
             const photo = document.getElementById('photo-input').files[0];
+
+            if (!photo) {
+                notifyError('Nenhuma foto selecionada.')
+                return;
+            }
+
             updateUserPhoto(photo);
         });
 
         $('#remove-photo').click((e) => {
             e.preventDefault();
 
-            const photo = current ?? defaultPhoto;
+            if (current === null && !saveCurrentPhoto()) {
+                return;
+            }
+
+            const photo = current;
+            current = null;
 
             updateUserPhoto(current);
+        });
+
+        $(window).on('load', () => {
+            saveCurrentPhoto();
         });
     </script>
 @endpush
