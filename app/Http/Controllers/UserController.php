@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
-use Illuminate\Http\Request;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+
+use Illuminate\Support\Str;
+
 
 class UserController extends Controller
 {
@@ -38,8 +39,26 @@ class UserController extends Controller
         ]);
 
         $user = new User;
+
+        // binds the request data to the user.
         $user->name = $request->name;
         $user->email = $request->email;
+
+        // gets photo.
+        $photo = $request->file('photo_');
+        $filename = null;
+
+        if ($photo) {
+            // generates a unique name for the photo.
+            $filename = Str::uuid() . '.' . $photo->extension();
+
+            // moves the photo to the uploads folder.
+            $photo->storeAs('public/uploads', $filename);
+        }
+
+        // binds the photo to the user.
+        $user->photo = $filename;
+
         $user->save();
 
         return redirect('users')->with(['success' => 'Usuário cadastrado com sucesso.']);

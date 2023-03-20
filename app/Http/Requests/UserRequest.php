@@ -24,6 +24,7 @@ class UserRequest extends FormRequest
         return [
             'name' => 'required',
             'email' => 'required|email',
+            'photo' => 'image|mimes:jpeg,png,jpg|max:2048'
         ];
     }
 }
