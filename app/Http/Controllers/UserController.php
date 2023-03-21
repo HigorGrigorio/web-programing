@@ -88,18 +88,36 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::find($id);
+
+        // checks if user exists.
+        if (!$user) {
+            return redirect('users')->with(['fail' => 'Usuário não encontrado.']);
+        }
+
         return view('user.edit', compact('user'));
     }
 
     public function confirm($id)
     {
         $user = User::find($id);
+
+        // checks if user exists.
+        if (!$user) {
+            return redirect('users')->with(['fail' => 'Usuário não encontrado.']);
+        }
+
         return view('user.delete', compact('user'));
     }
 
     public function update($id, UserRequest $request)
     {
         $user = User::find($id);
+
+        // checks if user exists.
+        if (!$user) {
+            return redirect('users')->with(['fail' => 'Usuário não encontrado.']);
+        }
+
         $user->name = $request->name;
         $user->email = $request->email;
         $user->save();
