@@ -6,6 +6,7 @@ use App\Http\Requests\UserRequest;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -67,6 +68,18 @@ class UserController extends Controller
     public function delete($id)
     {
         $user = User::find($id);
+
+        // checks if user exists.
+        if (!$user) {
+            return redirect('users')->with(['fail' => 'Usuário não encontrado.']);
+        }
+
+        // checks if user has a photo.
+        if ($user->photo) {
+            // removes the photo from storage.
+            Storage::delete('public/uploads/' . $user->photo);
+        }
+
         $user->delete();
 
         return redirect('users')->with(['success' => 'Usuário excluído com sucesso.']);
