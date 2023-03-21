@@ -1,0 +1,19 @@
+.fake-sort-btn,
+.sort-btn {
+    background-color: #d1d1d1;
+    position: relative;
+    line-height: 100%;
+}
+
+.sort-btn:not(.active) i {
+    display: none;
+}
+
+.sort-btn > i {
+    position: absolute;
+    right: 0;
+    top: 15%;
+    padding: 0.5rem;
+    color: #000;
+    z-index: 10;
+}

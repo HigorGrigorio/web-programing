@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('lib/font-awesome/css/font-awesome.css') }}">
     <link rel="stylesheet" href="{{ asset('lib/font-awesome/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/input-file.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sort-btn.css') }}">
 
     <title>Document</title>
 </head>
