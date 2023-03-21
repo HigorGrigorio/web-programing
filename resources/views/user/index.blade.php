@@ -7,11 +7,16 @@
                 <div class="tile-body d-flex flex-row">
                     <x-alert />
                     <div class="d-flex align-items-center col-md-10" style="padding: 0;">
-                        <form class="input-group mb-3" action="user/search" method="POST">
-                            <input type="text" class="form-control" placeholder="Search for..."
-                                aria-label="Recipient's username" aria-describedby="basic-addon2">
+                        <form id="search" class="input-group mb-3" action="{{ url('user/search') }}" method="GET">
+                            @csrf
+                            <input name="offset" type="number" class="form-control" placeholder="Offset"
+                                aria-label="Offset" aria-describedby="basic-addon2" style="max-width:8rem;">
+                            <input name="limit" type="number" class="form-control" placeholder="Limit" aria-label="Limit"
+                                aria-describedby="basic-addon2" style="max-width:8rem;">
+                            <input name="search" type="text" class="form-control" placeholder="Search for..."
+                                aria-label="Search for..." aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <button class="btn btn-success" type="button">Button</button>
+                                <button class="btn btn-warning" type="submit">Button</button>
                             </div>
                         </form>
                     </div>
@@ -22,7 +27,7 @@
                         </a>
                     </div>
                 </div>
-                <table class="table table-striped table-bordered table-hover">
+                <table id="table" class="table table-striped table-bordered table-hover">
                     <tr>
                         <th>Id</th>
                         <th>Nome</th>
@@ -47,6 +52,13 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="container" id="table-message">
+                    @if (count($users) === 0)
+                        <div class="alert alert-warning" role="alert">
+                            Nenhum usuário encontrado.
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>

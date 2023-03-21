@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserRequest;
 
 use App\Models\User;
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 
@@ -92,5 +92,43 @@ class UserController extends Controller
         $user->save();
 
         return redirect('users')->with(['success' => 'Usuário atualizado com sucesso.']);
+    }
+
+    public function search(Request $request)
+    {
+        $raw = [
+            'search' => $request->search,
+            'offset' => $request->offset,
+            'limit' => $request->limit,
+        ];
+
+        $options = array_merge(
+            [
+                'search' => '',
+                'offset' => 0,
+                'limit' => 0,
+            ],
+            $raw
+        );
+
+        if ($options['search'] == '') {
+            return redirect('users');
+        }
+
+        $users = User::where('name', 'like', '%' . $options['search'] . '%')
+            ->orWhere('email', 'like', '%' . $options['search'] . '%')
+            ->orWhere('id', 'like', '%' . $options['search'] . '%');
+
+        if ($options['limit'] > 0) {
+            $users = $users->limit($options['limit']);
+        }
+
+        if ($options['offset'] > 0) {
+            $users = $users->offset($options['offset']);
+        }
+
+        $users = $users->get();
+
+        return view('user.index', compact('users'));
     }
 }

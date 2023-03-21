@@ -33,4 +33,6 @@ Route::prefix('user')->group(function () {
 
     Route::post('/{id}/photo/upload', [PhotoController::class, 'upload']);
     Route::get('/{id}/photo/remove', [PhotoController::class, 'remove']);
+
+    Route::get('/search', [UserController::class, 'search']);
 });
