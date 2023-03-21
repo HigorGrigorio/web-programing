@@ -4,15 +4,15 @@
     <div class="container">
         <div class="container">
             <div class="tile">
+                <x-alert />
                 <div class="tile-body d-flex flex-row">
-                    <x-alert />
                     <div class="d-flex align-items-center col-md-10" style="padding: 0;">
                         <form id="search" class="input-group mb-3" action="{{ url('user/search') }}" method="GET">
                             @csrf
                             <input name="offset" type="number" class="form-control" placeholder="Offset"
-                                aria-label="Offset" aria-describedby="basic-addon2" style="max-width:8rem;">
+                                aria-label="Offset" aria-describedby="basic-addon2" style="max-width: 8rem;">
                             <input name="limit" type="number" class="form-control" placeholder="Limit" aria-label="Limit"
-                                aria-describedby="basic-addon2" style="max-width:8rem;">
+                                aria-describedby="basic-addon2" style="max-width: 8rem;">
                             <input name="search" type="text" class="form-control" placeholder="Search for..."
                                 aria-label="Search for..." aria-describedby="basic-addon2">
                             <div class="input-group-append">
