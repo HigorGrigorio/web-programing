@@ -18,13 +18,15 @@ class UserService implements UserServiceInterface
         try {
             $users = $this->repository->paginate(10);
 
-            return Result::success($users);
+            $result = Result::success($users);
         } catch (\Exception $e) {
-            return Result::fail([
+            $result = Result::fail([
                 'fail' => 'Erro ao buscar usuários',
                 'error' => $e->getMessage()
             ]);
         }
+
+        return $result;
     }
 
     public function create($data): Result
@@ -32,15 +34,17 @@ class UserService implements UserServiceInterface
         try {
             $this->repository->create($data);
 
-            return Result::success([
+            $result = Result::success([
                 'success' => 'Usuário cadastrado com sucesso'
             ]);
         } catch (\Exception $e) {
-            return Result::fail([
+            $result = Result::fail([
                 'fail' => 'Erro ao cadastrar usuário',
                 'error' => $e->getMessage()
             ]);
         }
+
+        return $result;
     }
 
     public function update($data, $id): Result
@@ -49,22 +53,24 @@ class UserService implements UserServiceInterface
             $user = $this->repository->find($id);
 
             if (!$user) {
-                return Result::fail([
+                $result = Result::fail([
                     'fail' => 'Usuário não encontrado'
                 ]);
             }
 
             $user->update($data);
 
-            return Result::success([
+            $result = Result::success([
                 'success' => 'Usuário atualizado com sucesso'
             ]);
         } catch (\Exception $e) {
-            return Result::fail([
+            $result = Result::fail([
                 'fail' => 'Erro ao atualizar usuário',
                 'error' => $e->getMessage()
             ]);
         }
+
+        return $result;
     }
 
     public function getById($id): Result
@@ -73,17 +79,19 @@ class UserService implements UserServiceInterface
             $user = $this->repository->find($id);
 
             if (!$user) {
-                return Result::fail([
+                $result = Result::fail([
                     'fail' => 'Usuário não encontrado'
                 ]);
             }
 
-            return Result::success($user);
+            $result = Result::success($user);
         } catch (\Exception $e) {
-            return Result::fail([
+            $result = Result::fail([
                 'fail' => 'Erro ao buscar usuário'
             ]);
         }
+
+        return $result;
     }
 
     public function delete($id): Result
@@ -92,21 +100,23 @@ class UserService implements UserServiceInterface
             $user = $this->repository->find($id);
 
             if (!$user) {
-                return Result::fail([
+                $result = Result::fail([
                     'fail' => 'Usuário não encontrado'
                 ]);
             }
 
             $user->delete();
 
-            return Result::success([
+            $result = Result::success([
                 'success' => 'Usuário excluído com sucesso'
             ]);
         } catch (\Exception $e) {
-            return Result::fail([
+            $result = Result::fail([
                 'fail' => 'Erro ao excluir usuário',
                 'error' => $e->getMessage()
             ]);
         }
+
+        return $result;
     }
 }
