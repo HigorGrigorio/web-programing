@@ -6,26 +6,10 @@
             <div class="tile">
                 <x-alert />
                 <div class="tile-body d-flex flex-row">
-                    <div class="d-flex align-items-center col-md-10" style="padding: 0;">
-                        <form id="search" class="input-group mb-3" action="{{ url('user/search') }}" method="GET">
-                            @csrf
-                            <input name="offset" type="number" class="form-control " placeholder="Offset"
-                                aria-label="Offset" style="max-width: 8rem;">
-                            <input name="limit" type="number" class="form-control" placeholder="Limit" aria-label="Limit"
-                                style="max-width: 8rem;">
-                            <input name="search" type="text" class="form-control" placeholder="Search for..."
-                                aria-label="Search for...">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="submit">Button</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="d-flex flex-row-reverse" style="width: 100%">
-                        <a href="{{ url('user/new') }}" class="btn btn-primary mb-3 btn-md">
-                            <i class="fa fa-plus-circle"></i>
-                            <span class="ml-2 flex-nowrap">Inserir usuário</span>
-                        </a>
-                    </div>
+                    <a href="{{ url('user/new') }}" class="btn btn-primary mb-3 btn-md">
+                        <i class="fa fa-plus-circle"></i>
+                        <span class="ml-2 flex-nowrap">Inserir usuário</span>
+                    </a>
                 </div>
                 @if (count($users) === 0)
                     <div class="container px-0" id="table-message">
@@ -34,22 +18,19 @@
                         </div>
                     </div>
                 @else
-                    <table id="table" class="table table-striped table-bordered table-hover">
+                    <table id="table" class="table table-striped table-bordered table-sm">
                         <thead>
-                            <tr>
-                                <th class="sort-btn active" data-row="0">
+                            <tr role="row">
+                                <th class="th-sm">
                                     Id
-                                    <i class="fa fa-arrow-down"></i>
                                 </th>
-                                <th class="sort-btn" data-row="1">
+                                <th class="th-sm">
                                     Nome
-                                    <i class="fa fa-arrow-down"></i>
                                 </th>
-                                <th class="sort-btn" data-row="2">
+                                <th class="th-sm">
                                     Email
-                                    <i class="fa fa-arrow-down"></i>
                                 </th>
-                                <th class="fake-sort-btn">
+                                <th class="th-sm">
                                     Ações
                                 </th>
                             </tr>
@@ -74,6 +55,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    {{ $users->links() }}
                 @endif
             </div>
         </div>
@@ -82,63 +64,27 @@
 
 @push('scripts')
     <script>
-        $('.sort-btn').click(function() {
-            // get the row number
-            var row = $(this).data('row');
-
-            // remove the active class from all the buttons
-            $('.sort-btn').removeClass('active');
-
-            // add the active class to the clicked button
-            $(this).addClass('active');
-
-            // get lines from table
-            var lines = $('#table tbody tr').get();
-
-            // sort the lines based on columns number
-            lines.sort((a, b) => {
-                // get the text of the columns
-                a = $(a).children('td').eq(row).text();
-                b = $(b).children('td').eq(row).text();
-
-                // if the text is a number, convert to number
-                if (!isNaN(a) && !isNaN(b)) {
-                    a = parseInt(a);
-                    b = parseInt(b);
-                }
-
-                // if the text is a date, convert to date
-                if (Date.parse(a) && Date.parse(b)) {
-                    a = new Date(a);
-                    b = new Date(b);
-                }
-
-                // if the text is a string, convert to string
-                if (typeof a === 'string' && typeof b === 'string') {
-                    a = a.toUpperCase();
-                    b = b.toUpperCase();
-                }
-
-                // compare the values
-                if (a < b) {
-                    return -1;
-                }
-                if (a > b) {
-                    return 1;
-                }
-
-                return 0;
-            })
-
-            // while has childres remove them, ignoring 1st th
-            while ($('#table tbody').children().length > 0) {
-                $('#table tbody').children().remove();
-            }
-
-            // append the lines to the table
-            $.each(lines, function(index, line) {
-                $('#table tbody').append(line);
-            });
+        $('#table').DataTable({
+            responsive: true,
+            autoWidth: false,
+            paging: false,
+            searching: true,
+            info: false,
+            order: [
+                [0, "desc"]
+            ],
+            columnDef: [
+                /** enable sorting to all conlumns */
+                {
+                    orderable: true,
+                    targets: "_all"
+                },
+                /** disable sorting to 'Actions' column */
+                {
+                    orderable: false,
+                    targets: "th:contains('Ações')"
+                },
+            ],
         });
     </script>
 @endpush

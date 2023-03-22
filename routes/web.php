@@ -15,12 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Route::get('/users', [UserController::class, 'index']);
-
 
 Route::prefix('user')->group(function () {
     Route::get('/new', [UserController::class, 'create']);
@@ -33,6 +28,4 @@ Route::prefix('user')->group(function () {
 
     Route::post('/{id}/photo/upload', [PhotoController::class, 'upload']);
     Route::get('/{id}/photo/remove', [PhotoController::class, 'remove']);
-
-    Route::get('/search', [UserController::class, 'search']);
 });

@@ -3,28 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
-
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-
+use App\Interfaces\UserServiceInterface;
 
 class UserController extends Controller
 {
+    public function __construct(
+        private UserServiceInterface $userService,
+    ) {
+    }
+
     public function index()
     {
-        $users = User::all();
+        $result = $this->userService->getAll();
+
+        if ($result->isFailure()) {
+            return redirect('users')->with($result->getError());
+        }
+
+        $users = $result->getObject();
 
         return view(
             'user.index',
-            compact('users')
-            /**
             [
-                'users' => $users
+                'users' => $users,
             ]
-         */
-
         )->with(['success', 'Usuário cadastrado com sucesso']);
     }
 
@@ -39,7 +45,7 @@ class UserController extends Controller
             'email' => 'unique:users',
         ]);
 
-        $user = new User;
+        $user = new User();
 
         // binds the request data to the user.
         $user->name = $request->name;
@@ -67,99 +73,78 @@ class UserController extends Controller
 
     public function delete($id)
     {
-        $user = User::find($id);
+        $userResult = $this->userService->getById($id);
 
-        // checks if user exists.
-        if (!$user) {
-            return redirect('users')->with(['fail' => 'Usuário não encontrado.']);
+        if (!$userResult) {
+            return redirect('users')->with($userResult->getData());
         }
 
-        // checks if user has a photo.
+        $user = $userResult->getObject();
+
+        // checks if user has photo
         if ($user->photo) {
-            // removes the photo from storage.
+            // TODO: use photo service.
+            // deletes the photo.
             Storage::delete('public/uploads/' . $user->photo);
         }
 
-        $user->delete();
+        // deletes the user.
+        $this->userService->delete($id);
 
         return redirect('users')->with(['success' => 'Usuário excluído com sucesso.']);
     }
 
     public function edit($id)
     {
-        $user = User::find($id);
+        $result = $this->userService->getById($id);
 
-        // checks if user exists.
-        if (!$user) {
-            return redirect('users')->with(['fail' => 'Usuário não encontrado.']);
+        if ($result->isFailure()) {
+            return redirect('users')->with($result->getError());
         }
+
+        $user = $result->getObject();
 
         return view('user.edit', compact('user'));
     }
 
     public function confirm($id)
     {
-        $user = User::find($id);
+        $result = $this->userService->getById($id);
 
-        // checks if user exists.
-        if (!$user) {
-            return redirect('users')->with(['fail' => 'Usuário não encontrado.']);
+        if (!$result->isSuccess()) {
+            return redirect('users')->with($result->getError());
         }
+
+        $user = $result->getObject();
 
         return view('user.delete', compact('user'));
     }
 
     public function update($id, UserRequest $request)
     {
-        $user = User::find($id);
+        $findResult = $this->userService->getById($id);
 
-        // checks if user exists.
-        if (!$user) {
-            return redirect('users')->with(['fail' => 'Usuário não encontrado.']);
+        if (!$findResult->isSuccess()) {
+            return redirect('users')->with($findResult->getError());
         }
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->save();
-
-        return redirect('users')->with(['success' => 'Usuário atualizado com sucesso.']);
-    }
-
-    public function search(Request $request)
-    {
         $raw = [
-            'search' => $request->search,
-            'offset' => $request->offset,
-            'limit' => $request->limit,
+            'name' => $request->name,
+            'email' => $request->email,
         ];
 
-        $options = array_merge(
+        $user = $findResult->getObject();
+
+        $data = array_merge(
             [
-                'search' => '',
-                'offset' => 0,
-                'limit' => 0,
+                'name' => $user->name,
+                'email' => $user->email,
             ],
             $raw
         );
 
-        if ($options['search'] == '') {
-            return redirect('users');
-        }
+        $updateResult = $this->userService->update($data, $id);
 
-        $users = User::where('name', 'like', '%' . $options['search'] . '%')
-            ->orWhere('email', 'like', '%' . $options['search'] . '%')
-            ->orWhere('id', 'like', '%' . $options['search'] . '%');
-
-        if ($options['limit'] > 0) {
-            $users = $users->limit($options['limit']);
-        }
-
-        if ($options['offset'] > 0) {
-            $users = $users->offset($options['offset']);
-        }
-
-        $users = $users->get();
-
-        return view('user.index', compact('users'));
+        return redirect('users')->with($updateResult->getObject());
     }
 }
