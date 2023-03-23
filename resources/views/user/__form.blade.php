@@ -68,6 +68,7 @@
         }
 
         const notifyError = (message) => {
+            console.log(message)
             const alert = document.getElementById('uploadAlert')
 
             const notify = makeAlert('danger', message);
@@ -112,7 +113,15 @@
              * When the user clicks on the remove photo button
              * the current photo is removed and the default photo is displayed
              */
-            let current = null;
+            let photos = [];
+
+            /**
+             * When the user clicks on the cancel button, if has a photo saved
+             * on cache it is restored.
+             *
+             * @type Array<Blob> An arrays of blobs.
+             */
+            let cache = null;
 
             // save a copy of the current photo from img thumbnail
             const saveCurrentPhoto = () => {
@@ -130,11 +139,14 @@
                     xhrFields: {
                         responseType: 'blob'
                     },
-                    success: function(blob, status, xhr) {
-                        current = new Blob([blob], {
+                    success: (blob, status, xhr) => {
+                        photos.push(new Blob([blob], {
                             type: xhr.getResponseHeader('Content-Type')
-                        });
+                        }));
 
+                        if (!cache) {
+                            cache = photos[0];
+                        }
                     },
                     error: function(xhr, status, error) {
                         notifyError('Não foi possível carregar a foto atual.');
@@ -144,27 +156,39 @@
                 return true;
             }
 
-            const updateUserPhoto = (photo) => {
+            // remove current photo
+            const removeUserPhoto = () => {
+                // update user image for default if not has a old photo saved
+                let url;
+
+                if (photos.length == 0) {
+                    url = '{{ asset('images/default-photo.jpg') }}';
+                } else {
+                    url = URL.createObjectURL(photos.pop());
+                }
+
+                priviewImage(url);
+
+                // delete from server
+                $.ajax({
+                    url: '{{ url('user/' . (isset($user) ? $user->id : '-1') . '/photo/remove') }}',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                    },
+                    type: 'get',
+                    success: function(result) {
+                        notifySuccess(result.success);
+                    },
+                    error: result => notifyError(result)
+                });
+            }
+
+            const updateUserPhoto = (photo, notify = true) => {
                 if (!photo) {
-                    $.ajax({
-                        url: '{{ url('user/' . (isset($user) ? $user->id : '-1') . '/photo/remove') }}',
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                        },
-                        type: 'get',
-                        success: function(message) {
-                            // alter user image url
-                            const url = '{{ asset('images/default-photo.jpg') }}';
-
-                            priviewImage(url);
-                            notifySuccess(message);
-                        },
-                        error: notifyError
-                    });
-
+                    notifyError('Nenhuma foto selecionada.');
                     return;
                 }
 
@@ -179,18 +203,19 @@
                     processData: false,
                     data: formData,
                     type: 'post',
-                    success: function(hashedFileName) {
+                    success: function(result) {
                         // alter user image url
-                        const url = '{{ asset('storage/uploads') }}' + '/' + hashedFileName;
+                        const url = '{{ asset('storage/uploads') }}' + '/' + result.filename;
 
                         priviewImage(url);
 
-                        notifySuccess('Foto atualizada com sucesso!');
-                        console.log('success');
+                        if (notify)
+                            notifySuccess(result.success);
                     },
-                    error: function() {
-                        notifyError('Erro ao atualizar foto!');
-                        console.log('error');
+                    error: function(result) {
+                        console.log(e);
+                        if (result.fail && notify)
+                            notifyError(result.fail);
                     }
                 });
             }
@@ -199,9 +224,7 @@
             $("#upload").click((e) => {
                 e.preventDefault();
 
-                if (current === null) {
-                    saveCurrentPhoto();
-                }
+                saveCurrentPhoto();
 
                 const photo = document.getElementById('photo-input').files[0];
 
@@ -216,20 +239,44 @@
             $('#remove-photo').click((e) => {
                 e.preventDefault();
 
-                if (current === null && !saveCurrentPhoto()) {
-                    notifyError('Nenhuma foto selecionada.');
-                    return;
+                removeUserPhoto();
+            });
+
+            $("#previous").click(e => {
+                e.preventDefault();
+
+                if (cache) {
+                    formData = new FormData();
+                    formData.append('photo', photo, 'photo.jpg');
+                    formData.append('_token', '{{ csrf_token() }}');
+
+                    $.ajax({
+                        url: '{{ url('user/' . (isset($user) ? $user->id : '-1') . '/photo/upload') }}',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+                        type: 'post',
+                        success: function(result) {
+                            // alter user image url
+                            const url = '{{ asset('storage/uploads') }}' + '/' + result.filename;
+
+                            priviewImage(url);
+
+                            if (notify)
+                                notifySuccess(result.success);
+                        },
+                        error: function(result) {
+                            console.log(e);
+                            if (result.fail && notify)
+                                notifyError(result.fail);
+                        }
+                    });
+                } else {
+                    //redirect to btn href
+                    window.location.href = $('#previous').attr('href');
                 }
-
-                const photo = current;
-                current = null;
-
-                updateUserPhoto(current);
-            });
-
-            $(window).on('load', () => {
-                saveCurrentPhoto();
-            });
+            })
         </script>
     @endpush
 @endif
@@ -237,11 +284,6 @@
 @if ($context == 'store')
     @push('scripts')
         <script>
-            const resetForm = () => {
-                $('#form').trigger('reset');
-                $('#img-thumbnail').attr('src', '{{ asset('images/default-photo.jpg') }}');
-            }
-
             $('#remove-photo').click((e) => {
                 e.preventDefault();
 

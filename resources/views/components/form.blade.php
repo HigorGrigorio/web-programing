@@ -17,7 +17,7 @@
     @endforeach
     <div class="d-flex justify-content-center justify-content-between pt-3">
         <button type="submit" class="btn btn-primary btn-lg">{{ $submit['label'] }}</button>
-        <a href="{{ $previous['url'] }}" class="btn btn-danger btn-lg">{{ $previous['label'] }}</a>
+        <a id="previous" href="{{ $previous['url'] }}" class="btn btn-danger btn-lg">{{ $previous['label'] }}</a>
     </div>
     <div class="col-md-12 pt-5 px-0" id="notify-container">
     </div>

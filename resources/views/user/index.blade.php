@@ -71,20 +71,12 @@
             searching: true,
             info: false,
             order: [
-                [0, "desc"]
+                [0, "asc"]
             ],
-            columnDef: [
-                /** enable sorting to all conlumns */
-                {
-                    orderable: true,
-                    targets: "_all"
-                },
-                /** disable sorting to 'Actions' column */
-                {
-                    orderable: false,
-                    targets: "th:contains('Ações')"
-                },
-            ],
+            columnDefs: [{
+                orderable: false,
+                targets: [3]
+            }],
         });
     </script>
 @endpush
